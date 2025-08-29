@@ -112,8 +112,24 @@ async def upload_resume(
                     "has_preview": True,
                 }
             })
+            
+            # Clean up local file after successful MongoDB storage
+            try:
+                if os.path.exists(pdf_storage_path):
+                    os.remove(pdf_storage_path)
+                    logger.info(f"Cleaned up local PDF file: {pdf_storage_path}")
+            except Exception as cleanup_error:
+                logger.warning(f"Failed to cleanup local PDF file {pdf_storage_path}: {cleanup_error}")
+                
         except Exception as e:
             logger.warning(f"Failed to save PDF for preview: {e}")
+            # Clean up local file even if MongoDB save fails
+            try:
+                if os.path.exists(pdf_storage_path):
+                    os.remove(pdf_storage_path)
+                    logger.info(f"Cleaned up local PDF file after DB save failure: {pdf_storage_path}")
+            except Exception as cleanup_error:
+                logger.warning(f"Failed to cleanup local PDF file after error: {cleanup_error}")
             # Continue even if file save fails - document is already in database
         
         return UploadResponse(
