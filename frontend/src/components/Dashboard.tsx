@@ -13,36 +13,62 @@ const Dashboard = () => {
   const [activeTab, setActiveTab] = useState<TabType>('upload');
   const [insights, setInsights] = useState<InsightDocument[]>([]);
   const [loading, setLoading] = useState(false);
+  const [refreshing, setRefreshing] = useState(false);
   const [latestInsight, setLatestInsight] = useState<InsightDocument | null>(null);
   
   const { user } = useUser();
   const { getInsights } = useApiService();
 
-  // Load insights when component mounts or when switching to history tab
-  const loadInsights = async () => {
+  // Load insights when component mounts and when switching to history tab
+  const loadInsights = async (isRefresh = false) => {
     try {
-      setLoading(true);
+      if (isRefresh) {
+        setRefreshing(true);
+      } else {
+        setLoading(true);
+      }
       const response = await getInsights();
       setInsights(response.insights);
     } catch (error) {
       console.error('Failed to load insights:', error);
     } finally {
       setLoading(false);
+      setRefreshing(false);
     }
   };
 
+  // Load insights on component mount to populate dashboard metrics
+  useEffect(() => {
+    loadInsights();
+  }, []);
+
+  // Also load insights when switching to history tab
   useEffect(() => {
     if (activeTab === 'history') {
       loadInsights();
     }
   }, [activeTab]);
 
+  // Set up periodic refresh every 30 seconds to keep dashboard updated
+  useEffect(() => {
+    const interval = setInterval(() => {
+      if (activeTab === 'upload') {
+        loadInsights(true); // Refresh data in background
+      }
+    }, 30000); // 30 seconds
+
+    return () => clearInterval(interval);
+  }, [activeTab]);
+
   const handleUploadSuccess = (newInsight: InsightDocument) => {
     setLatestInsight(newInsight);
-    // Add to insights list if we have it loaded
-    if (insights.length > 0) {
-      setInsights([newInsight, ...insights]);
-    }
+    // Add to insights list and refresh metrics
+    setInsights(prevInsights => [newInsight, ...prevInsights]);
+  };
+
+  // Refresh dashboard data
+  const refreshDashboard = async () => {
+    await loadInsights(true);
   };
 
   return (
@@ -60,6 +86,19 @@ const Dashboard = () => {
             </div>
             
             <div className="flex items-center space-x-4">
+              <button
+                onClick={refreshDashboard}
+                disabled={refreshing}
+                className={`flex items-center space-x-2 px-3 py-2 text-sm rounded-md transition-colors ${
+                  refreshing 
+                    ? 'text-gray-400 cursor-not-allowed' 
+                    : 'text-gray-600 hover:text-gray-800 hover:bg-gray-100'
+                }`}
+                title="Refresh Dashboard"
+              >
+                <Clock className={`h-4 w-4 ${refreshing ? 'animate-spin' : ''}`} />
+                <span>{refreshing ? 'Refreshing...' : 'Refresh'}</span>
+              </button>
               <div className="flex items-center space-x-2 text-sm text-gray-600">
                 <User className="h-4 w-4" />
                 <span>Welcome, {user?.firstName || 'User'}</span>
@@ -75,7 +114,13 @@ const Dashboard = () => {
         <div className="max-w-7xl mx-auto px-6">
           <nav className="flex space-x-8">
             <button
-              onClick={() => setActiveTab('upload')}
+              onClick={() => {
+                setActiveTab('upload');
+                // Refresh dashboard data when switching to upload tab
+                if (activeTab !== 'upload') {
+                  loadInsights(true);
+                }
+              }}
               className={`py-4 px-1 border-b-2 font-medium text-sm flex items-center space-x-2 ${
                 activeTab === 'upload'
                   ? 'border-blue-500 text-blue-600'
@@ -133,7 +178,9 @@ const Dashboard = () => {
                   </div>
                   <div>
                     <p className="text-sm font-medium text-gray-600">Total Documents</p>
-                    <p className="text-2xl font-bold text-gray-900">{insights.length}</p>
+                    <p className="text-2xl font-bold text-gray-900">
+                      {loading ? '...' : insights.length}
+                    </p>
                   </div>
                 </div>
               </div>
@@ -146,7 +193,7 @@ const Dashboard = () => {
                   <div>
                     <p className="text-sm font-medium text-gray-600">AI Analyses</p>
                     <p className="text-2xl font-bold text-gray-900">
-                      {insights.filter(i => !i.is_fallback).length}
+                      {loading ? '...' : insights.filter(i => !i.is_fallback).length}
                     </p>
                   </div>
                 </div>
@@ -160,7 +207,7 @@ const Dashboard = () => {
                   <div>
                     <p className="text-sm font-medium text-gray-600">Last Upload</p>
                     <p className="text-sm font-bold text-gray-900">
-                      {latestInsight ? new Date(latestInsight.upload_date).toLocaleDateString() : 'None'}
+                      {loading ? '...' : (latestInsight ? new Date(latestInsight.upload_date).toLocaleDateString() : 'None')}
                     </p>
                   </div>
                 </div>

@@ -92,7 +92,8 @@ async def upload_resume(
             provider=provider,
             is_fallback=is_fallback,
             filename=file.filename,
-            upload_date=insight_doc.upload_date
+            upload_date=insight_doc.upload_date,
+            document_id=str(result.inserted_id)
         )
         
     except HTTPException:
@@ -123,8 +124,8 @@ async def get_insights(
         # Convert to InsightDocument objects
         insights = []
         for doc in documents:
-            # Remove MongoDB's _id field
-            doc.pop("_id", None)
+            # Convert MongoDB's _id to string id field
+            doc["id"] = str(doc.pop("_id"))
             insights.append(InsightDocument(**doc))
         
         return InsightsResponse(

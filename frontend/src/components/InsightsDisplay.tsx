@@ -129,7 +129,7 @@ const InsightsDisplay = ({ insight }: InsightsDisplayProps) => {
       {/* Footer */}
       <div className="px-6 py-3 bg-gray-50 border-t">
         <div className="flex items-center justify-between text-xs text-gray-500">
-          <span>Document ID: {insight.user_id.slice(-8)}</span>
+          <span>Document ID: {insight.id}</span>
           <span>
             Processed with {insight.provider.charAt(0).toUpperCase() + insight.provider.slice(1)} AI
             {insight.is_fallback && ' (Fallback)'}

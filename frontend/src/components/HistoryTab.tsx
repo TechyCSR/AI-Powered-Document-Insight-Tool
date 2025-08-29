@@ -155,9 +155,9 @@ const HistoryTab = ({ insights, loading, onRefresh }: HistoryTabProps) => {
       {/* Documents Grid */}
       {!loading && filteredInsights.length > 0 && (
         <div className="grid gap-4">
-          {filteredInsights.map((insight, index) => (
+          {filteredInsights.map((insight) => (
             <div
-              key={index}
+              key={insight.id}
               onClick={() => setSelectedInsight(insight)}
               className="bg-white rounded-lg shadow-sm border p-6 hover:shadow-md transition-shadow cursor-pointer"
             >
@@ -170,12 +170,16 @@ const HistoryTab = ({ insights, loading, onRefresh }: HistoryTabProps) => {
                       {insight.filename}
                     </h3>
                     
-                    <div className="flex items-center space-x-4 text-sm text-gray-500 mb-3">
+                    <div className="flex items-center space-x-4 text-sm text-gray-500 mb-2">
                       <span className="flex items-center space-x-1">
                         <Calendar className="h-3 w-3" />
                         <span>{formatDate(insight.upload_date)}</span>
                       </span>
                       <span>{formatFileSize(insight.file_size)}</span>
+                    </div>
+                    
+                    <div className="text-xs text-gray-400 mb-3">
+                      <span className="font-mono">ID: {insight.id}</span>
                     </div>
                     
                     <p className="text-gray-700 text-sm line-clamp-2 mb-3">

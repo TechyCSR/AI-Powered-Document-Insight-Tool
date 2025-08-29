@@ -76,6 +76,7 @@ const UploadSection = ({ onUploadSuccess }: UploadSectionProps) => {
         
         // Create insight object for parent component
         const insight: InsightDocument = {
+          id: response.document_id,
           user_id: '', // Will be filled by the API
           filename: response.filename,
           upload_date: response.upload_date,

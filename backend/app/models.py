@@ -10,6 +10,7 @@ class AIProvider(str, Enum):
 
 
 class InsightDocument(BaseModel):
+    id: Optional[str] = Field(None, description="Document ID")
     user_id: str = Field(..., description="Clerk user ID")
     filename: str = Field(..., description="Original filename")
     upload_date: datetime = Field(default_factory=datetime.utcnow)
@@ -32,6 +33,7 @@ class UploadResponse(BaseModel):
     is_fallback: bool
     filename: str
     upload_date: datetime
+    document_id: str
 
 
 class InsightsResponse(BaseModel):

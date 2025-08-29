@@ -1,4 +1,5 @@
 export interface InsightDocument {
+  id: string;
   user_id: string;
   filename: string;
   upload_date: string;
@@ -16,6 +17,7 @@ export interface UploadResponse {
   is_fallback: boolean;
   filename: string;
   upload_date: string;
+  document_id: string;
 }
 
 export interface InsightsResponse {
