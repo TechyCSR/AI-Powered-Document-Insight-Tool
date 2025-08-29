@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { SignInButton, SignUpButton } from '@clerk/clerk-react';
-import { FileText, Brain, Users, Zap, Sparkles, Bot, Shield, ArrowRight } from 'lucide-react';
+import { FileText, Brain, Zap, Sparkles, Bot, Shield, ArrowRight } from 'lucide-react';
 import ThemeToggle from './ThemeToggle';
 import DeveloperProfile from './DeveloperProfile';
 

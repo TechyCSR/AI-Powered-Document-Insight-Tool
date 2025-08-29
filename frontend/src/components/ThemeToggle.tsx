@@ -4,7 +4,7 @@ import { useTheme } from '../contexts/ThemeContext';
 import type { Theme } from '../contexts/ThemeContext';
 
 const ThemeToggle: React.FC = () => {
-  const { theme, resolvedTheme, setTheme } = useTheme();
+  const { theme, setTheme } = useTheme();
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
