@@ -1,0 +1,44 @@
+{
+  "name": "ai-powered-document-insight-tool",
+  "version": "1.0.0",
+  "description": "A full-stack web application for AI-powered document analysis",
+  "main": "index.js",
+  "scripts": {
+    "dev": "concurrently \"npm run backend:dev\" \"npm run frontend:dev\"",
+    "backend:dev": "cd backend && uvicorn app.main:app --reload --host 0.0.0.0 --port 8000",
+    "frontend:dev": "cd frontend && npm run dev",
+    "backend:install": "cd backend && pip install -r requirements.txt",
+    "frontend:install": "cd frontend && npm install",
+    "install:all": "npm run backend:install && npm run frontend:install",
+    "build": "cd frontend && npm run build",
+    "setup": "./setup.sh"
+  },
+  "keywords": [
+    "ai",
+    "document-analysis",
+    "fastapi",
+    "react",
+    "pdf-processing",
+    "sarvam-ai",
+    "gemini-ai",
+    "mongodb",
+    "clerk-auth"
+  ],
+  "author": "Your Name",
+  "license": "MIT",
+  "devDependencies": {
+    "concurrently": "^8.2.2"
+  },
+  "engines": {
+    "node": ">=18.0.0",
+    "python": ">=3.9.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/yourusername/ai-powered-document-insight-tool.git"
+  },
+  "bugs": {
+    "url": "https://github.com/yourusername/ai-powered-document-insight-tool/issues"
+  },
+  "homepage": "https://github.com/yourusername/ai-powered-document-insight-tool#readme"
+}

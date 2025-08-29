@@ -5,7 +5,7 @@ import UploadSection from './UploadSection';
 import InsightsDisplay from './InsightsDisplay';
 import HistoryTab from './HistoryTab';
 import { useApiService } from '../lib/api';
-import { InsightDocument } from '../types';
+import type { InsightDocument } from '../types';
 
 type TabType = 'upload' | 'history';
 

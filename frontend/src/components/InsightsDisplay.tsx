@@ -1,5 +1,5 @@
 import { Brain, FileText, Calendar, AlertTriangle, Zap } from 'lucide-react';
-import { InsightDocument } from '../types';
+import type { InsightDocument } from '../types';
 
 interface InsightsDisplayProps {
   insight: InsightDocument;

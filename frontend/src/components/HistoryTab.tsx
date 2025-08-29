@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { RefreshCw, FileText, Calendar, Brain, Search, AlertTriangle, Zap } from 'lucide-react';
-import { InsightDocument } from '../types';
+import type { InsightDocument } from '../types';
 import InsightsDisplay from './InsightsDisplay';
 
 interface HistoryTabProps {

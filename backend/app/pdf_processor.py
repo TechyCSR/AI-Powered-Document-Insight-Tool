@@ -1,7 +1,7 @@
 import pdfplumber
 import tempfile
 import os
-from typing import str
+from typing import Optional
 import logging
 
 logger = logging.getLogger(__name__)

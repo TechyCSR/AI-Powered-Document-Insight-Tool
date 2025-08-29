@@ -1,7 +1,7 @@
 import { useState, useRef } from 'react';
 import { Upload, FileText, Loader2, AlertCircle, CheckCircle } from 'lucide-react';
 import { useApiService } from '../lib/api';
-import { AIProvider, InsightDocument } from '../types';
+import type { AIProvider, InsightDocument } from '../types';
 
 interface UploadSectionProps {
   onUploadSuccess: (insight: InsightDocument) => void;

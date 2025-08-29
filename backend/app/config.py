@@ -18,7 +18,12 @@ class Settings(BaseSettings):
     # Application Settings
     environment: str = os.getenv("ENVIRONMENT", "development")
     debug: bool = os.getenv("DEBUG", "True").lower() == "true"
-    allowed_origins: List[str] = os.getenv("ALLOWED_ORIGINS", "http://localhost:5173").split(",")
+    allowed_origins: str = os.getenv("ALLOWED_ORIGINS", "http://localhost:5173")
+    
+    @property
+    def origins_list(self) -> List[str]:
+        """Convert allowed_origins string to list"""
+        return [origin.strip() for origin in self.allowed_origins.split(",")]
     
     # Upload Settings
     max_file_size: int = 10 * 1024 * 1024  # 10MB
