@@ -17,9 +17,6 @@ const PDFPreview = ({ file, documentId, filename, isOpen, onClose }: PDFPreviewP
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  // Debug logging
-  console.log('PDFPreview props:', { file: !!file, documentId, filename, isOpen });
-
   useEffect(() => {
     if (isOpen && file) {
       // Create URL for file preview (new uploads)
