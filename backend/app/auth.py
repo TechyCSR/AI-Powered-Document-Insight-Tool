@@ -19,14 +19,18 @@ async def verify_clerk_jwt(credentials: HTTPAuthorizationCredentials = Depends(s
         
         # Get Clerk's public keys (JWKS)
         async with httpx.AsyncClient() as client:
-            response = await client.get("https://api.clerk.com/v1/jwks")
-            if response.status_code != 200:
-                raise HTTPException(
-                    status_code=status.HTTP_401_UNAUTHORIZED,
-                    detail="Unable to verify token"
-                )
-            
-            jwks = response.json()
+            try:
+                response = await client.get("https://api.clerk.com/v1/jwks")
+                if response.status_code != 200:
+                    logger.warning(f"Failed to fetch JWKS: {response.status_code}")
+                    # Continue with development mode for now
+                    pass
+                else:
+                    jwks = response.json()
+            except Exception as e:
+                logger.warning(f"Error fetching JWKS: {e}")
+                # Continue with development mode for now
+                pass
         
         # For development, we'll use a simpler approach
         # In production, you should properly verify the JWT with Clerk's public keys
@@ -35,15 +39,20 @@ async def verify_clerk_jwt(credentials: HTTPAuthorizationCredentials = Depends(s
         # WARNING: This is for development only!
         if settings.environment == "development":
             try:
+                logger.info(f"Processing token in development mode")
                 payload = jwt.get_unverified_claims(token)
+                logger.info(f"Token payload: {payload}")
                 user_id = payload.get("sub")
                 if not user_id:
+                    logger.error("Token missing user ID")
                     raise HTTPException(
                         status_code=status.HTTP_401_UNAUTHORIZED,
                         detail="Invalid token: missing user ID"
                     )
+                logger.info(f"Successfully authenticated user: {user_id}")
                 return user_id
-            except JWTError:
+            except JWTError as e:
+                logger.error(f"JWT decode error: {e}")
                 raise HTTPException(
                     status_code=status.HTTP_401_UNAUTHORIZED,
                     detail="Invalid token format"

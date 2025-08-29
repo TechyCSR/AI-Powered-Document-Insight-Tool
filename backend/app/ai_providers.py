@@ -18,17 +18,22 @@ class AIProviderService:
         Get summary from specified AI provider with fallback
         Returns: (summary, is_fallback)
         """
+        logger.info(f"Starting AI analysis with provider: {provider}")
         try:
             if provider == AIProvider.SARVAM:
+                logger.info("Using Sarvam AI provider")
                 summary = await AIProviderService._get_sarvam_summary(text)
             elif provider == AIProvider.GEMINI:
+                logger.info("Using Gemini AI provider")
                 summary = await AIProviderService._get_gemini_summary(text)
             else:
                 raise ValueError(f"Unknown provider: {provider}")
             
             if summary:
+                logger.info(f"AI analysis successful with {provider}")
                 return summary, False
             else:
+                logger.warning(f"AI analysis failed with {provider}, using fallback")
                 # If AI fails, use fallback
                 return AIProviderService._get_fallback_summary(text), True
                 
@@ -52,7 +57,7 @@ class AIProviderService:
                 }
                 
                 payload = {
-                    "model": "sarvam-2b-v0.5",  # Adjust model name as per Sarvam docs
+                    "model": "sarvam-m",  # Correct model name from Sarvam docs
                     "messages": [
                         {
                             "role": "system",
@@ -63,20 +68,24 @@ class AIProviderService:
                             "content": f"Please analyze this resume and provide a professional summary:\n\n{text[:4000]}"  # Limit text length
                         }
                     ],
-                    "max_tokens": 200,
-                    "temperature": 0.3
+                    "max_tokens": 1000,
+                    "temperature": 0.2,  # Recommended for non-thinking mode
+                    "top_p": 1,
+                    "reasoning_effort": "low"  # Enable thinking mode for better analysis
                 }
                 
-                # Note: Using a placeholder URL - replace with actual Sarvam API endpoint
+                # Correct Sarvam API endpoint
                 response = await client.post(
-                    "https://api.sarvam.ai/chat/completions",  # Placeholder URL
+                    "https://api.sarvam.ai/v1/chat/completions",
                     headers=headers,
                     json=payload
                 )
                 
                 if response.status_code == 200:
                     result = response.json()
-                    return result.get("choices", [{}])[0].get("message", {}).get("content", "").strip()
+                    content = result.get("choices", [{}])[0].get("message", {}).get("content", "").strip()
+                    logger.info(f"Sarvam AI analysis successful: {len(content)} characters")
+                    return content
                 else:
                     logger.error(f"Sarvam API error: {response.status_code} - {response.text}")
                     return ""
@@ -113,7 +122,7 @@ class AIProviderService:
                 }
                 
                 response = await client.post(
-                    f"https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key={settings.gemini_api_key}",
+                    f"https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-pro:generateContent?key={settings.gemini_api_key}",
                     headers=headers,
                     json=payload
                 )
@@ -122,7 +131,9 @@ class AIProviderService:
                     result = response.json()
                     candidates = result.get("candidates", [])
                     if candidates and candidates[0].get("content", {}).get("parts"):
-                        return candidates[0]["content"]["parts"][0].get("text", "").strip()
+                        content = candidates[0]["content"]["parts"][0].get("text", "").strip()
+                        logger.info(f"Gemini AI analysis successful: {len(content)} characters")
+                        return content
                 else:
                     logger.error(f"Gemini API error: {response.status_code} - {response.text}")
                     return ""
