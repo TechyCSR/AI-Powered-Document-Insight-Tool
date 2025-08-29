@@ -5,6 +5,7 @@ import UploadSection from './UploadSection';
 import InsightsDisplay from './InsightsDisplay';
 import HistoryTab from './HistoryTab';
 import ThemeToggle from './ThemeToggle';
+import DeveloperProfile from './DeveloperProfile';
 import { useApiService } from '../lib/api';
 import type { InsightDocument } from '../types';
 
@@ -16,6 +17,7 @@ const Dashboard = () => {
   const [loading, setLoading] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
   const [latestInsight, setLatestInsight] = useState<InsightDocument | null>(null);
+  const [showDeveloperProfile, setShowDeveloperProfile] = useState(false);
   
   const { user } = useUser();
   const { getInsights } = useApiService();
@@ -226,6 +228,45 @@ const Dashboard = () => {
           />
         )}
       </main>
+
+      {/* Modern Footer */}
+      <footer className="relative mt-32 bg-gradient-to-r from-gray-900 via-blue-900 to-purple-900 dark:from-gray-950 dark:via-blue-950 dark:to-purple-950">
+        <div className="absolute inset-0 bg-black/20" />
+        <div className="relative max-w-7xl mx-auto px-6 py-12">
+          <div className="text-center">
+            {/* Logo */}
+            <div className="flex items-center justify-center space-x-3 mb-6">
+              <div className="relative">
+                <div className="absolute inset-0 bg-gradient-to-r from-blue-400 to-purple-400 rounded-xl blur-lg opacity-50" />
+                <div className="relative bg-white/10 backdrop-blur-sm p-3 rounded-xl border border-white/20">
+                  <Brain className="h-8 w-8 text-white" />
+                </div>
+              </div>
+              <span className="text-2xl font-bold text-white">DocInsight AI</span>
+            </div>
+            
+            {/* Divider */}
+            <div className="w-32 h-0.5 bg-gradient-to-r from-blue-400 to-purple-400 mx-auto mb-6" />
+            
+            {/* Developer Credit */}
+            <p className="text-gray-300 text-lg">
+              Developed by{' '}
+              <button
+                onClick={() => setShowDeveloperProfile(true)}
+                className="font-bold text-transparent bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text hover:from-blue-300 hover:to-purple-300 transition-all duration-300 underline decoration-blue-400/50 hover:decoration-blue-400 underline-offset-4 hover:scale-105 inline-block transform"
+              >
+                @TechyCSR
+              </button>
+            </p>
+          </div>
+        </div>
+      </footer>
+
+      {/* Developer Profile Popup */}
+      <DeveloperProfile 
+        isOpen={showDeveloperProfile}
+        onClose={() => setShowDeveloperProfile(false)}
+      />
     </div>
   );
 };

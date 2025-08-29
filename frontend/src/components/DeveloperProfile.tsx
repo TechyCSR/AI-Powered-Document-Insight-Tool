@@ -111,15 +111,15 @@ const DeveloperProfile: React.FC<DeveloperProfileProps> = ({ isOpen, onClose }) 
         {/* Enhanced Close Button */}
         <button
           onClick={onClose}
-          className="absolute top-6 right-6 z-10 p-3 rounded-full bg-red-500/10 hover:bg-red-500/20 dark:bg-red-400/10 dark:hover:bg-red-400/20 backdrop-blur-sm border border-red-200/30 dark:border-red-700/30 shadow-lg hover:shadow-red-500/25 transition-all duration-300 group"
+          className="absolute top-4 right-4 z-10 p-2 rounded-full bg-red-500/10 hover:bg-red-500/20 dark:bg-red-400/10 dark:hover:bg-red-400/20 backdrop-blur-sm border border-red-200/30 dark:border-red-700/30 shadow-lg hover:shadow-red-500/25 transition-all duration-300 group"
         >
-          <X className="w-5 h-5 text-red-600 dark:text-red-400 group-hover:text-red-700 dark:group-hover:text-red-300 transition-colors" />
+          <X className="w-4 h-4 text-red-600 dark:text-red-400 group-hover:text-red-700 dark:group-hover:text-red-300 transition-colors" />
         </button>
         
         {/* Content */}
-        <div className="relative p-8">
+        <div className="relative p-6">
           {/* Technical Header */}
-          <div className="flex items-center justify-between mb-8">
+          <div className="flex items-center justify-between mb-6">
             <div className="flex items-center space-x-4">
               <div className="relative">
                 <div className="absolute inset-0 bg-gradient-to-r from-green-400 to-blue-500 rounded-lg blur-lg opacity-60 animate-pulse" />
@@ -133,7 +133,7 @@ const DeveloperProfile: React.FC<DeveloperProfileProps> = ({ isOpen, onClose }) 
                   TechyCSR
                 </h2>
                 <p className="text-sm text-gray-600 dark:text-gray-400 font-mono">
-                  Senior Full-Stack Engineer
+                  Full-Stack Developer & Machine Learning Engineer
                 </p>
               </div>
             </div>
@@ -146,7 +146,7 @@ const DeveloperProfile: React.FC<DeveloperProfileProps> = ({ isOpen, onClose }) 
           </div>
 
           {/* Technical Skills Carousel */}
-          <div className="mb-8 bg-gray-50/50 dark:bg-gray-800/50 rounded-2xl p-6 border border-gray-200/50 dark:border-gray-700/50">
+          <div className="mb-6 bg-gray-50/50 dark:bg-gray-800/50 rounded-2xl p-4 border border-gray-200/50 dark:border-gray-700/50">
             <div className="flex items-center justify-between mb-4">
               <h3 className="text-lg font-semibold text-gray-800 dark:text-gray-200 flex items-center">
                 <Cpu className="w-5 h-5 mr-2 text-blue-500" />
@@ -164,7 +164,7 @@ const DeveloperProfile: React.FC<DeveloperProfileProps> = ({ isOpen, onClose }) 
               </div>
             </div>
             
-            <div className="relative h-16 overflow-hidden">
+            <div className="relative h-14 overflow-hidden">
               {techStack.map((skill, index) => (
                 <div
                   key={index}
@@ -175,7 +175,7 @@ const DeveloperProfile: React.FC<DeveloperProfileProps> = ({ isOpen, onClose }) 
                   }`}
                 >
                   <div className="flex items-center space-x-3">
-                    <div className="p-3 bg-gradient-to-r from-blue-500 to-purple-500 rounded-xl text-white">
+                    <div className="p-2 bg-gradient-to-r from-blue-500 to-purple-500 rounded-lg text-white">
                       {skill.icon}
                     </div>
                     <div>
@@ -195,7 +195,7 @@ const DeveloperProfile: React.FC<DeveloperProfileProps> = ({ isOpen, onClose }) 
           </div>
 
           {/* Achievements Grid */}
-          <div className="mb-8">
+          <div className="mb-6">
             <h3 className="text-lg font-semibold text-gray-800 dark:text-gray-200 mb-4 flex items-center">
               <Award className="w-5 h-5 mr-2 text-yellow-500" />
               Achievements
@@ -204,7 +204,7 @@ const DeveloperProfile: React.FC<DeveloperProfileProps> = ({ isOpen, onClose }) 
               {achievements.map((achievement, index) => (
                 <div
                   key={index}
-                  className="flex items-center space-x-2 p-3 bg-white/60 dark:bg-gray-800/60 rounded-xl border border-white/30 dark:border-gray-700/30 hover:scale-105 transition-transform duration-300"
+                  className="flex items-center space-x-2 p-2.5 bg-white/60 dark:bg-gray-800/60 rounded-lg border border-white/30 dark:border-gray-700/30 hover:scale-105 transition-transform duration-300"
                   style={{ animationDelay: `${index * 100}ms` }}
                 >
                   <div className="text-yellow-500">{achievement.icon}</div>
@@ -215,22 +215,22 @@ const DeveloperProfile: React.FC<DeveloperProfileProps> = ({ isOpen, onClose }) 
           </div>
 
           {/* Professional Links */}
-          <div className="mb-8">
+          <div className="mb-6">
             <h3 className="text-lg font-semibold text-gray-800 dark:text-gray-200 mb-4 flex items-center">
               <Globe className="w-5 h-5 mr-2 text-blue-500" />
               Connect & Explore
             </h3>
-            <div className="space-y-3">
+            <div className="space-y-2.5">
               {links.map((link, index) => (
                 <a
                   key={index}
                   href={link.url}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="group flex items-center p-4 bg-white/60 dark:bg-gray-800/60 rounded-xl border border-white/30 dark:border-gray-700/30 hover:bg-white/80 dark:hover:bg-gray-800/80 hover:scale-[1.02] transition-all duration-300"
+                  className="group flex items-center p-3 bg-white/60 dark:bg-gray-800/60 rounded-lg border border-white/30 dark:border-gray-700/30 hover:bg-white/80 dark:hover:bg-gray-800/80 hover:scale-[1.02] transition-all duration-300"
                   style={{ animationDelay: `${index * 100}ms` }}
                 >
-                  <div className={`p-2.5 rounded-lg bg-gradient-to-r ${link.color} text-white mr-4 group-hover:scale-110 transition-transform duration-300`}>
+                  <div className={`p-2 rounded-lg bg-gradient-to-r ${link.color} text-white mr-3 group-hover:scale-110 transition-transform duration-300`}>
                     {link.icon}
                   </div>
                   <div className="flex-1">
@@ -248,7 +248,7 @@ const DeveloperProfile: React.FC<DeveloperProfileProps> = ({ isOpen, onClose }) 
           </div>
 
           {/* Technical Footer */}
-          <div className="pt-6 border-t border-gray-200/50 dark:border-gray-700/50">
+          <div className="pt-4 border-t border-gray-200/50 dark:border-gray-700/50">
             <div className="flex items-center justify-between">
               <div className="flex items-center space-x-3">
                 <div className="relative">
