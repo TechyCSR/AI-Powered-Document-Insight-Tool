@@ -4,6 +4,7 @@ import { Brain, Upload, History, FileText, Clock, User } from 'lucide-react';
 import UploadSection from './UploadSection';
 import InsightsDisplay from './InsightsDisplay';
 import HistoryTab from './HistoryTab';
+import ThemeToggle from './ThemeToggle';
 import { useApiService } from '../lib/api';
 import type { InsightDocument } from '../types';
 
@@ -72,34 +73,35 @@ const Dashboard = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
       {/* Header */}
-      <header className="bg-white shadow-sm border-b">
+      <header className="bg-white dark:bg-gray-800 shadow-sm border-b dark:border-gray-700">
         <div className="max-w-7xl mx-auto px-6 py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-3">
-              <Brain className="h-8 w-8 text-blue-600" />
+              <Brain className="h-8 w-8 text-blue-600 dark:text-blue-400" />
               <div>
-                <h1 className="text-xl font-bold text-gray-900">DocInsight AI</h1>
-                <p className="text-sm text-gray-500">AI-Powered Document Analysis</p>
+                <h1 className="text-xl font-bold text-gray-900 dark:text-white">DocInsight AI</h1>
+                <p className="text-sm text-gray-500 dark:text-gray-400">AI-Powered Document Analysis</p>
               </div>
             </div>
             
             <div className="flex items-center space-x-4">
+              <ThemeToggle />
               <button
                 onClick={refreshDashboard}
                 disabled={refreshing}
                 className={`flex items-center space-x-2 px-3 py-2 text-sm rounded-md transition-colors ${
                   refreshing 
-                    ? 'text-gray-400 cursor-not-allowed' 
-                    : 'text-gray-600 hover:text-gray-800 hover:bg-gray-100'
+                    ? 'text-gray-400 dark:text-gray-500 cursor-not-allowed' 
+                    : 'text-gray-600 dark:text-gray-300 hover:text-gray-800 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-700'
                 }`}
                 title="Refresh Dashboard"
               >
                 <Clock className={`h-4 w-4 ${refreshing ? 'animate-spin' : ''}`} />
                 <span>{refreshing ? 'Refreshing...' : 'Refresh'}</span>
               </button>
-              <div className="flex items-center space-x-2 text-sm text-gray-600">
+              <div className="flex items-center space-x-2 text-sm text-gray-600 dark:text-gray-300">
                 <User className="h-4 w-4" />
                 <span>Welcome, {user?.firstName || 'User'}</span>
               </div>
@@ -110,7 +112,7 @@ const Dashboard = () => {
       </header>
 
       {/* Navigation Tabs */}
-      <div className="bg-white border-b">
+      <div className="bg-white dark:bg-gray-800 border-b dark:border-gray-700">
         <div className="max-w-7xl mx-auto px-6">
           <nav className="flex space-x-8">
             <button
@@ -121,10 +123,10 @@ const Dashboard = () => {
                   loadInsights(true);
                 }
               }}
-              className={`py-4 px-1 border-b-2 font-medium text-sm flex items-center space-x-2 ${
+              className={`py-4 px-1 border-b-2 font-medium text-sm flex items-center space-x-2 transition-colors ${
                 activeTab === 'upload'
-                  ? 'border-blue-500 text-blue-600'
-                  : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                  ? 'border-blue-500 text-blue-600 dark:text-blue-400'
+                  : 'border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 hover:border-gray-300 dark:hover:border-gray-600'
               }`}
             >
               <Upload className="h-4 w-4" />
@@ -133,16 +135,16 @@ const Dashboard = () => {
             
             <button
               onClick={() => setActiveTab('history')}
-              className={`py-4 px-1 border-b-2 font-medium text-sm flex items-center space-x-2 ${
+              className={`py-4 px-1 border-b-2 font-medium text-sm flex items-center space-x-2 transition-colors ${
                 activeTab === 'history'
-                  ? 'border-blue-500 text-blue-600'
-                  : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                  ? 'border-blue-500 text-blue-600 dark:text-blue-400'
+                  : 'border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 hover:border-gray-300 dark:hover:border-gray-600'
               }`}
             >
               <History className="h-4 w-4" />
               <span>History</span>
               {insights.length > 0 && (
-                <span className="bg-blue-100 text-blue-600 text-xs px-2 py-1 rounded-full">
+                <span className="bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 text-xs px-2 py-1 rounded-full">
                   {insights.length}
                 </span>
               )}
@@ -161,8 +163,8 @@ const Dashboard = () => {
             {/* Latest Insight Display */}
             {latestInsight && (
               <div className="mt-8">
-                <h2 className="text-xl font-semibold text-gray-900 mb-4 flex items-center space-x-2">
-                  <FileText className="h-5 w-5" />
+                <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-4 flex items-center space-x-2">
+                  <FileText className="h-5 w-5 text-gray-700 dark:text-gray-300" />
                   <span>Latest Analysis</span>
                 </h2>
                 <InsightsDisplay insight={latestInsight} />
@@ -171,42 +173,42 @@ const Dashboard = () => {
             
             {/* Quick Stats */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-8">
-              <div className="bg-white p-6 rounded-lg shadow-sm border">
+              <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-sm border dark:border-gray-700">
                 <div className="flex items-center space-x-3">
-                  <div className="bg-blue-100 p-3 rounded-lg">
-                    <FileText className="h-6 w-6 text-blue-600" />
+                  <div className="bg-blue-100 dark:bg-blue-900/30 p-3 rounded-lg">
+                    <FileText className="h-6 w-6 text-blue-600 dark:text-blue-400" />
                   </div>
                   <div>
-                    <p className="text-sm font-medium text-gray-600">Total Documents</p>
-                    <p className="text-2xl font-bold text-gray-900">
+                    <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Total Documents</p>
+                    <p className="text-2xl font-bold text-gray-900 dark:text-white">
                       {loading ? '...' : insights.length}
                     </p>
                   </div>
                 </div>
               </div>
               
-              <div className="bg-white p-6 rounded-lg shadow-sm border">
+              <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-sm border dark:border-gray-700">
                 <div className="flex items-center space-x-3">
-                  <div className="bg-green-100 p-3 rounded-lg">
-                    <Brain className="h-6 w-6 text-green-600" />
+                  <div className="bg-green-100 dark:bg-green-900/30 p-3 rounded-lg">
+                    <Brain className="h-6 w-6 text-green-600 dark:text-green-400" />
                   </div>
                   <div>
-                    <p className="text-sm font-medium text-gray-600">AI Analyses</p>
-                    <p className="text-2xl font-bold text-gray-900">
+                    <p className="text-sm font-medium text-gray-600 dark:text-gray-400">AI Analyses</p>
+                    <p className="text-2xl font-bold text-gray-900 dark:text-white">
                       {loading ? '...' : insights.filter(i => !i.is_fallback).length}
                     </p>
                   </div>
                 </div>
               </div>
               
-              <div className="bg-white p-6 rounded-lg shadow-sm border">
+              <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-sm border dark:border-gray-700">
                 <div className="flex items-center space-x-3">
-                  <div className="bg-purple-100 p-3 rounded-lg">
-                    <Clock className="h-6 w-6 text-purple-600" />
+                  <div className="bg-purple-100 dark:bg-purple-900/30 p-3 rounded-lg">
+                    <Clock className="h-6 w-6 text-purple-600 dark:text-purple-400" />
                   </div>
                   <div>
-                    <p className="text-sm font-medium text-gray-600">Last Upload</p>
-                    <p className="text-sm font-bold text-gray-900">
+                    <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Last Upload</p>
+                    <p className="text-sm font-bold text-gray-900 dark:text-white">
                       {loading ? '...' : (latestInsight ? new Date(latestInsight.upload_date).toLocaleDateString() : 'None')}
                     </p>
                   </div>

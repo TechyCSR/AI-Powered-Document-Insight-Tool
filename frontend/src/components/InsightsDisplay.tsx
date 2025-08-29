@@ -47,20 +47,20 @@ const InsightsDisplay = ({ insight }: InsightsDisplayProps) => {
   };
 
   return (
-    <div className="bg-white rounded-lg shadow-sm border overflow-hidden">
+    <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border dark:border-gray-700 overflow-hidden">
       {/* Header */}
-      <div className="p-6 border-b bg-gray-50">
+      <div className="p-6 border-b dark:border-gray-700 bg-gray-50 dark:bg-gray-900/50">
         <div className="flex items-start justify-between">
           <div className="flex items-center space-x-3">
-            <FileText className="h-6 w-6 text-gray-600" />
+            <FileText className="h-6 w-6 text-gray-600 dark:text-gray-400" />
             <div className="flex-1">
-              <h3 className="font-semibold text-gray-900">{insight.filename}</h3>
+              <h3 className="font-semibold text-gray-900 dark:text-white">{insight.filename}</h3>
               <div className="flex items-center space-x-4 mt-1">
-                <span className="text-sm text-gray-500 flex items-center space-x-1">
+                <span className="text-sm text-gray-500 dark:text-gray-400 flex items-center space-x-1">
                   <Calendar className="h-3 w-3" />
                   <span>{formatDate(insight.upload_date)}</span>
                 </span>
-                <span className="text-sm text-gray-500">
+                <span className="text-sm text-gray-500 dark:text-gray-400">
                   {formatFileSize(insight.file_size)}
                 </span>
               </div>

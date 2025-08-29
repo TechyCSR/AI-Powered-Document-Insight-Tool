@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { X, Download, ZoomIn, ZoomOut, RotateCw, Maximize2, Minimize2 } from 'lucide-react';
+import { X, Download, ZoomIn, ZoomOut, RotateCw, Maximize, Loader2 } from 'lucide-react';
 
 interface PDFPreviewProps {
   file?: File | null;
@@ -139,9 +139,9 @@ const PDFPreview = ({ file, documentId, filename, isOpen, onClose }: PDFPreviewP
       
       {/* Modal */}
       <div className={`relative h-full w-full flex flex-col ${isFullscreen ? 'p-0' : 'p-4'}`}>
-        <div className={`bg-white rounded-lg shadow-2xl flex flex-col h-full ${isFullscreen ? 'rounded-none' : ''}`}>
+        <div className={`bg-white dark:bg-gray-800 rounded-lg shadow-2xl flex flex-col h-full ${isFullscreen ? 'rounded-none' : ''}`}>
           {/* Header */}
-          <div className="flex items-center justify-between p-4 border-b bg-gray-50 rounded-t-lg">
+          <div className="flex items-center justify-between p-4 border-b dark:border-gray-700 bg-gray-50 dark:bg-gray-900/50 rounded-t-lg">
             <div className="flex items-center space-x-3">
               <div className="p-2 bg-blue-100 rounded-lg">
                 <svg className="w-5 h-5 text-blue-600" fill="currentColor" viewBox="0 0 20 20">

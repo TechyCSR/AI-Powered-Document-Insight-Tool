@@ -8,6 +8,7 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
       tailwind.config = {
+        darkMode: 'class',
         theme: {
           extend: {
             colors: {
@@ -41,6 +42,29 @@
           },
         },
       }
+    </script>
+    <script>
+      // Apply theme immediately on page load to prevent flash
+      (function() {
+        const savedTheme = localStorage.getItem('theme') || 'light';
+        const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+        
+        let shouldBeDark = false;
+        
+        if (savedTheme === 'dark') {
+          shouldBeDark = true;
+        } else if (savedTheme === 'system' && prefersDark) {
+          shouldBeDark = true;
+        }
+        
+        if (shouldBeDark) {
+          document.documentElement.classList.add('dark');
+          console.log('Applied dark theme immediately on page load');
+        } else {
+          document.documentElement.classList.remove('dark');
+          console.log('Applied light theme immediately on page load');
+        }
+      })();
     </script>
   </head>
   <body>
