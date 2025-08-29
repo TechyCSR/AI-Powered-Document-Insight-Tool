@@ -152,11 +152,13 @@ async def get_insights(
         cursor = collection.find({"user_id": user_id}).sort("upload_date", -1)
         documents = await cursor.to_list(length=None)
         
-        # Convert to InsightDocument objects
+        # Convert to InsightDocument objects (exclude binary blobs)
         insights = []
         for doc in documents:
             # Convert MongoDB's _id to string id field
             doc["id"] = str(doc.pop("_id"))
+            # Never send raw PDF bytes over this endpoint
+            doc.pop("pdf_blob", None)
             insights.append(InsightDocument(**doc))
         
         return InsightsResponse(
