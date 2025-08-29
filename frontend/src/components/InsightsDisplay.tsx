@@ -1,4 +1,5 @@
 import { Brain, FileText, Calendar, AlertTriangle, Zap } from 'lucide-react';
+import ReactMarkdown from 'react-markdown';
 import type { InsightDocument } from '../types';
 
 interface InsightsDisplayProps {
@@ -8,6 +9,11 @@ interface InsightsDisplayProps {
 const InsightsDisplay = ({ insight }: InsightsDisplayProps) => {
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleString();
+  };
+
+  const cleanSummary = (summary: string) => {
+    // Remove <think> tags and everything between them
+    return summary.replace(/<think>[\s\S]*?<\/think>/g, '').trim();
   };
 
   const formatFileSize = (bytes: number) => {
@@ -86,9 +92,21 @@ const InsightsDisplay = ({ insight }: InsightsDisplayProps) => {
         
         <div className="prose max-w-none">
           <div className={`p-4 rounded-lg ${insight.is_fallback ? 'bg-yellow-50 border border-yellow-200' : 'bg-blue-50 border border-blue-200'}`}>
-            <p className="text-gray-800 leading-relaxed whitespace-pre-wrap">
-              {insight.summary}
-            </p>
+            <div className="text-gray-800 leading-relaxed prose prose-sm max-w-none">
+              <ReactMarkdown 
+                components={{
+                  h1: ({children}) => <h1 className="text-xl font-bold mb-3">{children}</h1>,
+                  h2: ({children}) => <h2 className="text-lg font-semibold mb-2">{children}</h2>,
+                  h3: ({children}) => <h3 className="text-base font-medium mb-2">{children}</h3>,
+                  strong: ({children}) => <strong className="font-semibold text-gray-900">{children}</strong>,
+                  ul: ({children}) => <ul className="list-disc list-inside space-y-1 mb-3">{children}</ul>,
+                  li: ({children}) => <li className="text-gray-700">{children}</li>,
+                  p: ({children}) => <p className="mb-2">{children}</p>
+                }}
+              >
+                {cleanSummary(insight.summary)}
+              </ReactMarkdown>
+            </div>
           </div>
         </div>
 

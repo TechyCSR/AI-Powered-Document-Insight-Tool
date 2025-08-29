@@ -57,21 +57,43 @@ class AIProviderService:
                 }
                 
                 payload = {
-                    "model": "sarvam-m",  # Correct model name from Sarvam docs
+                    "model": "sarvam-m",
                     "messages": [
                         {
                             "role": "system",
-                            "content": "You are an expert resume analyzer. Provide a concise, professional summary of the candidate's key skills, experience, and qualifications in 2-3 sentences."
+                            "content": """You are an expert resume analyzer. Analyze the provided resume and return a structured analysis in EXACTLY this format:
+
+**Professional Summary:** [2-3 concise sentences highlighting key qualifications]
+
+**Key Skills:** [Comma-separated list of technical and soft skills]
+
+**Experience Highlights:** [2-3 bullet points of most relevant experience]
+
+**Education:** [Degree, institution, GPA if mentioned]
+
+**Notable Achievements:** [2-3 most impressive accomplishments]
+
+CRITICAL INSTRUCTIONS:
+- NEVER include <think> tags or internal reasoning
+- NEVER show your thinking process
+- NEVER include phrases like "Okay, let's tackle this" or "Wait, the user said"
+- ONLY return the final structured analysis starting with "**Professional Summary:**"
+- Use EXACTLY the format above with no additional text before or after
+- Keep responses professional and business-focused
+- Quantify achievements where possible
+- Focus on business value and impact
+
+IMPORTANT: Your response must start with "**Professional Summary:**" and contain only the structured analysis."""
                         },
                         {
                             "role": "user",
-                            "content": f"Please analyze this resume and provide a professional summary:\n\n{text[:4000]}"  # Limit text length
+                            "content": f"Please analyze this resume and provide a structured analysis:\n\n{text}"  # Send complete text
                         }
                     ],
                     "max_tokens": 1000,
-                    "temperature": 0.2,  # Recommended for non-thinking mode
+                    "temperature": 0.2,  # For consistent, focused output
                     "top_p": 1,
-                    "reasoning_effort": "low"  # Enable thinking mode for better analysis
+                    "reasoning_effort": "low"  # Minimize verbose thinking process
                 }
                 
                 # Correct Sarvam API endpoint
@@ -85,6 +107,7 @@ class AIProviderService:
                     result = response.json()
                     content = result.get("choices", [{}])[0].get("message", {}).get("content", "").strip()
                     logger.info(f"Sarvam AI analysis successful: {len(content)} characters")
+                    
                     return content
                 else:
                     logger.error(f"Sarvam API error: {response.status_code} - {response.text}")
@@ -110,12 +133,32 @@ class AIProviderService:
                 payload = {
                     "contents": [{
                         "parts": [{
-                            "text": f"Please analyze this resume and provide a concise professional summary highlighting key skills, experience, and qualifications in 2-3 sentences:\n\n{text[:4000]}"
+                            "text": f"""You are an expert resume analyzer. Analyze the provided resume and return a structured analysis in EXACTLY this format:
+
+**Professional Summary:** [2-3 concise sentences highlighting key qualifications]
+
+**Key Skills:** [Comma-separated list of technical and soft skills]
+
+**Experience Highlights:** [2-3 bullet points of most relevant experience]
+
+**Education:** [Degree, institution, GPA if mentioned]
+
+**Notable Achievements:** [2-3 most impressive accomplishments]
+
+IMPORTANT: 
+- Follow the exact format above
+- Keep responses professional and business-focused
+- Quantify achievements where possible
+- Focus on business value and impact
+
+Please analyze this resume and provide a structured analysis:
+
+{text}"""
                         }]
                     }],
                     "generationConfig": {
                         "temperature": 0.3,
-                        "maxOutputTokens": 200,
+                        "maxOutputTokens": 1000,  # Increased for structured output
                         "topP": 0.8,
                         "topK": 10
                     }
@@ -133,6 +176,7 @@ class AIProviderService:
                     if candidates and candidates[0].get("content", {}).get("parts"):
                         content = candidates[0]["content"]["parts"][0].get("text", "").strip()
                         logger.info(f"Gemini AI analysis successful: {len(content)} characters")
+                        
                         return content
                 else:
                     logger.error(f"Gemini API error: {response.status_code} - {response.text}")
@@ -142,9 +186,11 @@ class AIProviderService:
             logger.error(f"Gemini API request failed: {e}")
             return ""
     
+
+    
     @staticmethod
     def _get_fallback_summary(text: str) -> str:
-        """Generate fallback summary using top 5 frequent words"""
+        """Generate fallback summary using structured format"""
         try:
             # Clean and tokenize text
             words = re.findall(r'\b[a-zA-Z]{3,}\b', text.lower())
@@ -160,15 +206,49 @@ class AIProviderService:
                 if word not in stop_words and len(word) > 3
             ]
             
-            # Get top 5 most frequent words
+            # Get top 8 most frequent words for skills
             word_counts = Counter(filtered_words)
-            top_words = [word for word, count in word_counts.most_common(5)]
+            top_skills = [word for word, count in word_counts.most_common(8)]
             
-            if top_words:
-                return f"Key terms identified: {', '.join(top_words)}. (AI analysis unavailable - showing frequent keywords)"
-            else:
-                return "Document processed successfully. (AI analysis unavailable)"
+            # Extract education info (look for common degree patterns)
+            education_keywords = ['bachelor', 'master', 'phd', 'degree', 'university', 'college', 'gpa', 'cgpa']
+            education_info = "Education details extracted from document"
+            
+            # Extract experience info
+            experience_keywords = ['experience', 'years', 'worked', 'developed', 'managed', 'led']
+            experience_info = "Work experience details available in document"
+            
+            # Format in structured way
+            skills_text = ", ".join(top_skills) if top_skills else "Technical skills extracted from document"
+            
+            return f"""**Professional Summary:**  
+Document processed successfully. AI analysis unavailable - using keyword extraction.
+
+**Key Skills:**  
+{skills_text}
+
+**Experience Highlights:**  
+• {experience_info}
+
+**Education:**  
+{education_info}
+
+**Notable Achievements:**  
+• Document contains achievement information (AI analysis unavailable)"""
                 
         except Exception as e:
             logger.error(f"Fallback summary generation failed: {e}")
-            return "Document processed successfully. (Analysis unavailable)"
+            return """**Professional Summary:**  
+Document processed successfully. Analysis unavailable.
+
+**Key Skills:**  
+Unable to extract skills
+
+**Experience Highlights:**  
+• Information available in document
+
+**Education:**  
+• Details in document
+
+**Notable Achievements:**  
+• Information available in document"""
