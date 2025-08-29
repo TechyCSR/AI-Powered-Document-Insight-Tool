@@ -1,6 +1,7 @@
 import { useState, useRef } from 'react';
-import { Upload, FileText, Loader2, AlertCircle, CheckCircle } from 'lucide-react';
+import { Upload, FileText, Loader2, AlertCircle, CheckCircle, Eye } from 'lucide-react';
 import { useApiService } from '../lib/api';
+import PDFPreview from './PDFPreview';
 import type { AIProvider, InsightDocument } from '../types';
 
 interface UploadSectionProps {
@@ -13,6 +14,7 @@ const UploadSection = ({ onUploadSuccess }: UploadSectionProps) => {
   const [uploading, setUploading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
+  const [showPreview, setShowPreview] = useState(false);
   
   const fileInputRef = useRef<HTMLInputElement>(null);
   const { uploadResume } = useApiService();
@@ -84,6 +86,7 @@ const UploadSection = ({ onUploadSuccess }: UploadSectionProps) => {
           summary: response.summary,
           is_fallback: response.is_fallback,
           file_size: selectedFile.size,
+          has_preview: true, // New uploads always have preview
         };
         
         onUploadSuccess(insight);
@@ -164,14 +167,28 @@ const UploadSection = ({ onUploadSuccess }: UploadSectionProps) => {
         />
         
         {selectedFile ? (
-          <div className="flex items-center justify-center space-x-3">
-            <FileText className="h-8 w-8 text-blue-600" />
-            <div>
-              <p className="font-medium text-gray-900">{selectedFile.name}</p>
-              <p className="text-sm text-gray-500">
-                {(selectedFile.size / (1024 * 1024)).toFixed(2)} MB
-              </p>
+          <div className="space-y-4">
+            <div className="flex items-center justify-center space-x-3">
+              <FileText className="h-8 w-8 text-blue-600" />
+              <div>
+                <p className="font-medium text-gray-900">{selectedFile.name}</p>
+                <p className="text-sm text-gray-500">
+                  {(selectedFile.size / (1024 * 1024)).toFixed(2)} MB
+                </p>
+              </div>
             </div>
+            
+            {/* Preview Button */}
+            <button
+              onClick={(e) => {
+                e.stopPropagation(); // Prevent triggering file input
+                setShowPreview(true);
+              }}
+              className="inline-flex items-center space-x-2 px-4 py-2 bg-blue-50 text-blue-700 rounded-lg hover:bg-blue-100 transition-colors border border-blue-200"
+            >
+              <Eye className="h-4 w-4" />
+              <span>Preview Document</span>
+            </button>
           </div>
         ) : (
           <div>
@@ -225,6 +242,14 @@ const UploadSection = ({ onUploadSuccess }: UploadSectionProps) => {
           <p className="text-green-700">{success}</p>
         </div>
       )}
+      
+      {/* PDF Preview Modal */}
+      <PDFPreview
+        file={selectedFile}
+        filename={selectedFile?.name}
+        isOpen={showPreview}
+        onClose={() => setShowPreview(false)}
+      />
     </div>
   );
 };

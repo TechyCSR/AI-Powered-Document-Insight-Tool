@@ -8,6 +8,7 @@ from dotenv import load_dotenv
 from app.config import settings
 from app.database import connect_to_mongo, close_mongo_connection
 from app.routes import router
+from app.config import settings
 
 # Load environment variables
 load_dotenv()
@@ -30,6 +31,8 @@ async def lifespan(app: FastAPI):
     
     # Create upload directory if it doesn't exist
     os.makedirs(settings.upload_dir, exist_ok=True)
+    # Create PDF storage directory if it doesn't exist
+    os.makedirs(settings.pdf_storage_dir, exist_ok=True)
     
     yield
     

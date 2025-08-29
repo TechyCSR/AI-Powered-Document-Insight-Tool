@@ -7,6 +7,7 @@ export interface InsightDocument {
   summary: string;
   is_fallback: boolean;
   file_size: number;
+  has_preview?: boolean;
 }
 
 export interface UploadResponse {

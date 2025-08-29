@@ -1,5 +1,7 @@
-import { Brain, FileText, Calendar, AlertTriangle, Zap } from 'lucide-react';
+import { Brain, FileText, Calendar, AlertTriangle, Zap, Eye } from 'lucide-react';
 import ReactMarkdown from 'react-markdown';
+import { useState } from 'react';
+import PDFPreview from './PDFPreview';
 import type { InsightDocument } from '../types';
 
 interface InsightsDisplayProps {
@@ -7,6 +9,8 @@ interface InsightsDisplayProps {
 }
 
 const InsightsDisplay = ({ insight }: InsightsDisplayProps) => {
+  const [showPreview, setShowPreview] = useState(false);
+  
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleString();
   };
@@ -49,7 +53,7 @@ const InsightsDisplay = ({ insight }: InsightsDisplayProps) => {
         <div className="flex items-start justify-between">
           <div className="flex items-center space-x-3">
             <FileText className="h-6 w-6 text-gray-600" />
-            <div>
+            <div className="flex-1">
               <h3 className="font-semibold text-gray-900">{insight.filename}</h3>
               <div className="flex items-center space-x-4 mt-1">
                 <span className="text-sm text-gray-500 flex items-center space-x-1">
@@ -61,6 +65,17 @@ const InsightsDisplay = ({ insight }: InsightsDisplayProps) => {
                 </span>
               </div>
             </div>
+            
+            {/* Preview Button - Only show if preview is available */}
+            {insight.has_preview && (
+              <button
+                onClick={() => setShowPreview(true)}
+                className="inline-flex items-center space-x-2 px-3 py-2 bg-blue-50 text-blue-700 rounded-lg hover:bg-blue-100 transition-colors border border-blue-200 text-sm"
+              >
+                <Eye className="h-4 w-4" />
+                <span>Preview</span>
+              </button>
+            )}
           </div>
           
           <div className="flex items-center space-x-2">
@@ -136,6 +151,14 @@ const InsightsDisplay = ({ insight }: InsightsDisplayProps) => {
           </span>
         </div>
       </div>
+      
+      {/* PDF Preview Modal */}
+      <PDFPreview
+        documentId={insight.id}
+        filename={insight.filename}
+        isOpen={showPreview}
+        onClose={() => setShowPreview(false)}
+      />
     </div>
   );
 };

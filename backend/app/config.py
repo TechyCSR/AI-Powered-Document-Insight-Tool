@@ -29,6 +29,7 @@ class Settings(BaseSettings):
     max_file_size: int = 10 * 1024 * 1024  # 10MB
     allowed_file_types: List[str] = ["application/pdf"]
     upload_dir: str = "uploads"
+    pdf_storage_dir: str = "stored_pdfs"
     
     class Config:
         env_file = ".env"

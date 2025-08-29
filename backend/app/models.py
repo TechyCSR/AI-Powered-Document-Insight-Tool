@@ -18,11 +18,13 @@ class InsightDocument(BaseModel):
     summary: str = Field(..., description="Generated summary or fallback keywords")
     is_fallback: bool = Field(default=False, description="Whether fallback was used")
     file_size: int = Field(..., description="File size in bytes")
+    has_preview: bool = Field(default=False, description="Whether PDF preview is available")
     
     class Config:
         json_encoders = {
             datetime: lambda v: v.isoformat()
         }
+        extra = "allow"
 
 
 class UploadResponse(BaseModel):

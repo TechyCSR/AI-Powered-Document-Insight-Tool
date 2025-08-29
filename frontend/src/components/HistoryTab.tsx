@@ -1,7 +1,8 @@
 import { useState } from 'react';
-import { RefreshCw, FileText, Calendar, Brain, Search, AlertTriangle, Zap } from 'lucide-react';
+import { RefreshCw, FileText, Calendar, Brain, Search, AlertTriangle, Zap, Eye } from 'lucide-react';
 import type { InsightDocument } from '../types';
 import InsightsDisplay from './InsightsDisplay';
+import PDFPreview from './PDFPreview';
 
 interface HistoryTabProps {
   insights: InsightDocument[];
@@ -13,6 +14,8 @@ const HistoryTab = ({ insights, loading, onRefresh }: HistoryTabProps) => {
   const [selectedInsight, setSelectedInsight] = useState<InsightDocument | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [filterProvider, setFilterProvider] = useState<'all' | 'sarvam' | 'gemini'>('all');
+  const [previewInsight, setPreviewInsight] = useState<InsightDocument | null>(null);
+  const [showPreview, setShowPreview] = useState(false);
 
   // Filter insights based on search term and provider
   const filteredInsights = insights.filter(insight => {
@@ -56,6 +59,12 @@ const HistoryTab = ({ insights, loading, onRefresh }: HistoryTabProps) => {
       default:
         return 'bg-gray-100 text-gray-800 border-gray-200';
     }
+  };
+
+  const handlePreview = (insight: InsightDocument, e: React.MouseEvent) => {
+    e.stopPropagation(); // Prevent card click
+    setPreviewInsight(insight);
+    setShowPreview(true);
   };
 
   if (selectedInsight) {
@@ -189,6 +198,26 @@ const HistoryTab = ({ insights, loading, onRefresh }: HistoryTabProps) => {
                 </div>
                 
                 <div className="flex flex-col items-end space-y-2 ml-4">
+                  {/* Action Buttons */}
+                  <div className="flex items-center space-x-2">
+                    {insight.has_preview && (
+                      <button
+                        onClick={(e) => handlePreview(insight, e)}
+                        className="inline-flex items-center space-x-1 px-2 py-1 bg-blue-50 text-blue-700 rounded-md hover:bg-blue-100 transition-colors border border-blue-200 text-xs"
+                        title="Preview Document"
+                      >
+                        <Eye className="h-3 w-3" />
+                        <span>Preview</span>
+                      </button>
+                    )}
+                    {!insight.has_preview && (
+                      <span className="inline-flex items-center space-x-1 px-2 py-1 bg-gray-50 text-gray-500 rounded-md border border-gray-200 text-xs">
+                        <Eye className="h-3 w-3" />
+                        <span>No Preview</span>
+                      </span>
+                    )}
+                  </div>
+                  
                   {/* Provider Badge */}
                   <span className={`inline-flex items-center space-x-1 px-2 py-1 rounded-full text-xs font-medium border ${getProviderColor(insight.provider)}`}>
                     {getProviderIcon(insight.provider)}
@@ -238,6 +267,19 @@ const HistoryTab = ({ insights, loading, onRefresh }: HistoryTabProps) => {
             </div>
           </div>
         </div>
+      )}
+      
+      {/* PDF Preview Modal */}
+      {previewInsight && (
+        <PDFPreview
+          documentId={previewInsight.id}
+          filename={previewInsight.filename}
+          isOpen={showPreview}
+          onClose={() => {
+            setShowPreview(false);
+            setPreviewInsight(null);
+          }}
+        />
       )}
     </div>
   );
