@@ -29,10 +29,13 @@ async def lifespan(app: FastAPI):
     logger.info("Starting up AI Document Insight Tool API")
     await connect_to_mongo()
     
-    # Create upload directory if it doesn't exist
-    os.makedirs(settings.upload_dir, exist_ok=True)
-    # Create PDF storage directory if it doesn't exist
-    os.makedirs(settings.pdf_storage_dir, exist_ok=True)
+    # In serverless environments (production), we don't create local directories
+    # Files are stored directly in MongoDB
+    if settings.environment == "development":
+        # Create upload directory if it doesn't exist (development only)
+        os.makedirs(settings.upload_dir, exist_ok=True)
+        # Create PDF storage directory if it doesn't exist (development only) 
+        os.makedirs(settings.pdf_storage_dir, exist_ok=True)
     
     yield
     
@@ -52,7 +55,7 @@ app = FastAPI(
 # Add CORS middleware
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=settings.allowed_origins,
+    allow_origins=settings.origins_list,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],

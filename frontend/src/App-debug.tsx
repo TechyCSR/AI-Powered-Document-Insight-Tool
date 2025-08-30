@@ -1,5 +1,3 @@
-import React from 'react';
-
 // Simple test to see if React renders
 function TestComponent() {
   console.log('TestComponent rendering...');

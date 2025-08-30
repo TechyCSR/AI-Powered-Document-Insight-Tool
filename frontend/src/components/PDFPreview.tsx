@@ -48,7 +48,7 @@ const PDFPreview = ({ file, documentId, filename, isOpen, onClose }: PDFPreviewP
     setLoading(true);
     setError(null);
     
-    const apiBaseUrl = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000/api/v1';
+    const apiBaseUrl = import.meta.env.VITE_API_URL ? `${import.meta.env.VITE_API_URL}/api/v1` : 'http://localhost:8000/api/v1';
     
     try {
       const token = await (window as any).Clerk?.session?.getToken();

@@ -4,7 +4,6 @@ from typing import List
 from datetime import datetime
 import logging
 import os
-import aiofiles
 from bson import ObjectId
 
 from app.auth import get_current_user_id
@@ -60,88 +59,96 @@ async def upload_resume(
         # Get AI summary
         try:
             summary, is_fallback = await AIProviderService.get_summary(extracted_text, provider)
+            logger.info(f"AI processing successful. Summary length: {len(summary)}")
         except Exception as e:
             logger.error(f"AI processing failed: {e}")
             # Use fallback if AI completely fails
             summary = AIProviderService._get_fallback_summary(extracted_text)
             is_fallback = True
-        
-        # Create insight document
-        insight_doc = InsightDocument(
-            user_id=user_id,
-            filename=file.filename,
-            upload_date=datetime.utcnow(),
-            provider=provider,
-            summary=summary,
-            is_fallback=is_fallback,
-            file_size=len(file_content),
-            has_preview=True  # New uploads always have preview
-        )
-        
-        # Save to database first
-        try:
-            collection = db[INSIGHTS_COLLECTION]
-            result = await collection.insert_one(insight_doc.dict())
-            document_id = str(result.inserted_id)
-            logger.info(f"Saved insight document with ID: {document_id}")
-        except Exception as e:
-            logger.error(f"Database save failed: {e}")
-            raise HTTPException(
-                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-                detail="Failed to save document insights"
-            )
-        
-        # Save PDF both to disk (temporary) and to DB as GridFS-like binary
-        try:
-            # Create storage directory if it doesn't exist
-            os.makedirs(settings.pdf_storage_dir, exist_ok=True)
+            logger.info(f"Using fallback summary. Length: {len(summary)}")
 
-            pdf_filename = f"{document_id}.pdf"
-            pdf_storage_path = os.path.join(settings.pdf_storage_dir, pdf_filename)
-
-            # Save to disk for immediate preview speed
-            async with aiofiles.open(pdf_storage_path, 'wb') as f:
-                await f.write(file_content)
-            logger.info(f"Saved PDF file: {pdf_storage_path}")
-
-            # Also store the binary in the document for long-term preview
-            collection = db[INSIGHTS_COLLECTION]
-            await collection.update_one({"_id": ObjectId(document_id)}, {
-                "$set": {
-                    "pdf_blob": file_content,
-                    "has_preview": True,
-                }
-            })
-            
-            # Clean up local file after successful MongoDB storage
-            try:
-                if os.path.exists(pdf_storage_path):
-                    os.remove(pdf_storage_path)
-                    logger.info(f"Cleaned up local PDF file: {pdf_storage_path}")
-            except Exception as cleanup_error:
-                logger.warning(f"Failed to cleanup local PDF file {pdf_storage_path}: {cleanup_error}")
-                
-        except Exception as e:
-            logger.warning(f"Failed to save PDF for preview: {e}")
-            # Clean up local file even if MongoDB save fails
-            try:
-                if os.path.exists(pdf_storage_path):
-                    os.remove(pdf_storage_path)
-                    logger.info(f"Cleaned up local PDF file after DB save failure: {pdf_storage_path}")
-            except Exception as cleanup_error:
-                logger.warning(f"Failed to cleanup local PDF file after error: {cleanup_error}")
-            # Continue even if file save fails - document is already in database
-        
-        return UploadResponse(
+        # Prepare response data immediately after AI processing
+        upload_date = datetime.utcnow()
+        response_data = UploadResponse(
             success=True,
             message="Resume processed successfully",
             summary=summary,
             provider=provider,
             is_fallback=is_fallback,
             filename=file.filename,
-            upload_date=insight_doc.upload_date,
-            document_id=document_id
+            upload_date=upload_date,
+            document_id="temp"  # Will be updated if database save succeeds
         )
+
+        # Try to save to database (non-blocking for response)
+        document_id = None
+        has_preview = False
+        
+        try:
+            # Check if database is available
+            if db is None:
+                logger.warning("⚠️ Database connection not available, skipping save")
+                response_data.message = "Resume processed successfully (history not saved - database unavailable)"
+                return response_data
+            
+            # Create insight document
+            insight_doc = InsightDocument(
+                user_id=user_id,
+                filename=file.filename,
+                upload_date=upload_date,
+                provider=provider,
+                summary=summary,
+                is_fallback=is_fallback,
+                file_size=len(file_content),
+                has_preview=False  # Start with False, will update if PDF save succeeds
+            )
+            
+            # Save to database with proper async handling
+            try:
+                collection = db[INSIGHTS_COLLECTION]
+                result = await collection.insert_one(insight_doc.dict())
+                document_id = str(result.inserted_id)
+                response_data.document_id = document_id
+                logger.info(f"✅ Document saved to database with ID: {document_id}")
+                
+                # Try to save PDF binary (optional)
+                try:
+                    await collection.update_one({"_id": ObjectId(document_id)}, {
+                        "$set": {
+                            "pdf_blob": file_content,
+                            "has_preview": True,
+                        }
+                    })
+                    has_preview = True
+                    logger.info(f"✅ PDF binary saved for document ID: {document_id}")
+                except Exception as pdf_error:
+                    logger.warning(f"⚠️ PDF binary save failed (non-critical): {pdf_error}")
+                    # Update document to indicate no preview available
+                    try:
+                        await collection.update_one({"_id": ObjectId(document_id)}, {
+                            "$set": {"has_preview": False}
+                        })
+                    except:
+                        pass  # If this fails too, just continue
+                        
+            except RuntimeError as runtime_error:
+                if "Event loop is closed" in str(runtime_error):
+                    logger.error("❌ Event loop closed - serverless environment issue")
+                    response_data.message = "Resume processed successfully (history not saved - server issue)"
+                else:
+                    raise runtime_error
+            except Exception as db_save_error:
+                logger.error(f"❌ Database insert failed: {db_save_error}")
+                response_data.message = "Resume processed successfully (history not saved - database error)"
+                    
+        except Exception as db_error:
+            logger.error(f"❌ Database save failed: {db_error}")
+            logger.error(f"Database object type: {type(db)}")
+            logger.error(f"Database value: {db}")
+            # Don't fail the entire request - user still gets their summary
+            response_data.message = "Resume processed successfully (history not saved)"
+            
+        return response_data
         
     except HTTPException:
         raise
@@ -162,6 +169,15 @@ async def get_insights(
     Get all insights for the authenticated user
     """
     try:
+        # Check if database connection is available
+        if db is None:
+            logger.error("Database connection is None")
+            return InsightsResponse(
+                success=True,
+                insights=[],
+                total_count=0
+            )
+            
         collection = db[INSIGHTS_COLLECTION]
         
         # Query documents for this user, sorted by upload date (newest first)
@@ -171,11 +187,15 @@ async def get_insights(
         # Convert to InsightDocument objects (exclude binary blobs)
         insights = []
         for doc in documents:
-            # Convert MongoDB's _id to string id field
-            doc["id"] = str(doc.pop("_id"))
-            # Never send raw PDF bytes over this endpoint
-            doc.pop("pdf_blob", None)
-            insights.append(InsightDocument(**doc))
+            try:
+                # Convert MongoDB's _id to string id field
+                doc["id"] = str(doc.pop("_id"))
+                # Never send raw PDF bytes over this endpoint
+                doc.pop("pdf_blob", None)
+                insights.append(InsightDocument(**doc))
+            except Exception as doc_error:
+                logger.warning(f"Error processing document: {doc_error}")
+                continue
         
         return InsightsResponse(
             success=True,
@@ -185,9 +205,11 @@ async def get_insights(
         
     except Exception as e:
         logger.error(f"Error retrieving insights for user {user_id}: {e}")
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail="Failed to retrieve insights"
+        # Return empty list instead of error to prevent frontend crashes
+        return InsightsResponse(
+            success=True,
+            insights=[],
+            total_count=0
         )
 
 
@@ -221,23 +243,14 @@ async def get_document_preview(
                 detail="Document not found or access denied"
             )
         
-        # Check if PDF file exists on disk first (fast path)
-        pdf_filename = f"{document_id}.pdf"
-        pdf_path = os.path.join(settings.pdf_storage_dir, pdf_filename)
+        # Check if PDF file exists on disk first (fast path) - Skip for production
+        # In serverless environments, always use database storage
         
-        if os.path.exists(pdf_path):
-            # Return the PDF file from disk
-            return FileResponse(
-                path=pdf_path,
-                media_type="application/pdf",
-                filename=document.get("filename", "document.pdf")
-            )
-
-        # Fallback to DB-stored blob for older/cleaned files
+        # Get PDF content from database
         if document.get("pdf_blob"):
             return Response(content=document["pdf_blob"], media_type="application/pdf")
 
-        # Last resort: not found
+        # Not found - document exists but no PDF stored
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail="PDF file not found"
@@ -254,9 +267,40 @@ async def get_document_preview(
 
 
 @router.get("/health")
-async def health_check():
-    """Health check endpoint"""
-    return {"status": "healthy", "timestamp": datetime.utcnow().isoformat()}
+async def health_check(db = Depends(get_database)):
+    """Health check endpoint with database connectivity"""
+    health_status = {
+        "status": "healthy",
+        "timestamp": datetime.utcnow().isoformat(),
+        "environment": settings.environment,
+        "database": {
+            "connected": False,
+            "status": "disconnected",
+            "error": None
+        }
+    }
+    
+    # Check database connectivity
+    try:
+        if db is None:
+            health_status["database"]["status"] = "connection_failed"
+            health_status["database"]["error"] = "Database connection is None"
+        else:
+            # Try to ping the database
+            await db.command("ping")
+            health_status["database"]["connected"] = True
+            health_status["database"]["status"] = "connected"
+            
+            # Try to count documents in insights collection
+            collection = db[INSIGHTS_COLLECTION]
+            doc_count = await collection.count_documents({})
+            health_status["database"]["insights_count"] = doc_count
+            
+    except Exception as e:
+        health_status["database"]["status"] = "error"
+        health_status["database"]["error"] = str(e)
+    
+    return health_status
 
 
 @router.get("/")

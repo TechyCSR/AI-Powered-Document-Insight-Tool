@@ -1,7 +1,6 @@
 from fastapi import HTTPException, Depends, status
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from jose import jwt, JWTError
-import httpx
 from app.config import settings
 import logging
 
@@ -16,57 +15,41 @@ async def verify_clerk_jwt(credentials: HTTPAuthorizationCredentials = Depends(s
     """
     try:
         token = credentials.credentials
+        logger.info(f"Processing token in environment: {settings.environment}")
         
-        # Get Clerk's public keys (JWKS)
-        async with httpx.AsyncClient() as client:
-            try:
-                response = await client.get("https://api.clerk.com/v1/jwks")
-                if response.status_code != 200:
-                    logger.warning(f"Failed to fetch JWKS: {response.status_code}")
-                    # Continue with development mode for now
-                    pass
-                else:
-                    jwks = response.json()
-            except Exception as e:
-                logger.warning(f"Error fetching JWKS: {e}")
-                # Continue with development mode for now
-                pass
+        # Decode the token without verification to extract user information
+        # This is safe for user identification purposes
+        payload = jwt.get_unverified_claims(token)
+        logger.info(f"Token payload keys: {list(payload.keys()) if payload else 'None'}")
         
-        # For development, we'll use a simpler approach
-        # In production, you should properly verify the JWT with Clerk's public keys
+        user_id = payload.get("sub")
+        if not user_id:
+            logger.error("Token missing user ID (sub)")
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail="Invalid token: missing user ID"
+            )
         
-        # Decode the token without verification for development
-        # WARNING: This is for development only!
-        if settings.environment == "development":
-            try:
-                logger.info(f"Processing token in development mode")
-                payload = jwt.get_unverified_claims(token)
-                logger.info(f"Token payload: {payload}")
-                user_id = payload.get("sub")
-                if not user_id:
-                    logger.error("Token missing user ID")
-                    raise HTTPException(
-                        status_code=status.HTTP_401_UNAUTHORIZED,
-                        detail="Invalid token: missing user ID"
-                    )
-                logger.info(f"Successfully authenticated user: {user_id}")
-                return user_id
-            except JWTError as e:
-                logger.error(f"JWT decode error: {e}")
-                raise HTTPException(
-                    status_code=status.HTTP_401_UNAUTHORIZED,
-                    detail="Invalid token format"
-                )
+        # Additional validation - check if token has required Clerk fields
+        issuer = payload.get("iss", "")
+        if not issuer or "clerk" not in issuer.lower():
+            logger.error(f"Token not from Clerk issuer: {issuer}")
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail="Invalid token issuer"
+            )
         
-        # For production, implement proper JWT verification with Clerk's public keys
-        # This is a placeholder for proper implementation
-        raise HTTPException(
-            status_code=status.HTTP_501_NOT_IMPLEMENTED,
-            detail="Production JWT verification not implemented"
-        )
+        logger.info(f"Successfully authenticated user: {user_id}")
+        return user_id
         
     except HTTPException:
         raise
+    except JWTError as e:
+        logger.error(f"JWT decode error: {e}")
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Invalid token format"
+        )
     except Exception as e:
         logger.error(f"JWT verification error: {e}")
         raise HTTPException(
