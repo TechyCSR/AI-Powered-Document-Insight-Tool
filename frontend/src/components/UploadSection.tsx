@@ -134,7 +134,7 @@ const UploadSection = ({ onUploadSuccess }: UploadSectionProps) => {
             }`}
           >
             <div className="font-semibold dark:text-white">Sarvam AI</div>
-            <div className="text-sm text-gray-500 dark:text-gray-400 mt-1">Default </div>
+            <div className="text-sm text-gray-500 dark:text-gray-400 mt-1">Default & Indigenous AI</div>
           </button>
           
           <button
