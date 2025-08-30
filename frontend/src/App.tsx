@@ -3,7 +3,9 @@ import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Dashboard from './components/Dashboard';
 import LandingPage from './components/LandingPage';
 import ThemeToggle from './components/ThemeToggle';
+import MobileMessage from './components/MobileMessage';
 import { ThemeProvider } from './contexts/ThemeContext';
+import { useMobileDetection } from './hooks/useMobileDetection';
 
 const CLERK_PUBLISHABLE_KEY = import.meta.env.VITE_CLERK_PUBLISHABLE_KEY;
 
@@ -117,22 +119,30 @@ function MainApp() {
 function App() {
   console.log('App function called, Clerk key:', CLERK_PUBLISHABLE_KEY);
   
+  return (
+    <ThemeProvider>
+      <AppContent />
+    </ThemeProvider>
+  );
+}
+
+// App content with mobile detection
+function AppContent() {
+  const isMobile = useMobileDetection();
+  
+  // Show mobile message for mobile devices
+  if (isMobile) {
+    return <MobileMessage />;
+  }
+  
   // Check if Clerk key is properly configured
   if (!CLERK_PUBLISHABLE_KEY || CLERK_PUBLISHABLE_KEY.includes('placeholder') || CLERK_PUBLISHABLE_KEY === 'pk_test_your_actual_key_here') {
     console.log('Returning DemoApp');
-    return (
-      <ThemeProvider>
-        <DemoApp />
-      </ThemeProvider>
-    );
+    return <DemoApp />;
   }
   
   console.log('Returning MainApp');
-  return (
-    <ThemeProvider>
-      <MainApp />
-    </ThemeProvider>
-  );
+  return <MainApp />;
 }
 
 export default App;

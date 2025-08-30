@@ -9,6 +9,16 @@ const LandingPage = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 dark:from-gray-950 dark:via-gray-900 dark:to-blue-950 relative overflow-hidden">
+      {/* Mobile Warning Banner */}
+      <div className="block md:hidden bg-yellow-50 dark:bg-yellow-900/20 border-b border-yellow-200 dark:border-yellow-800 px-4 py-3 relative z-50">
+        <div className="flex items-center justify-center space-x-2 text-sm">
+          <span className="text-yellow-600 dark:text-yellow-400">⚠️</span>
+          <span className="text-yellow-800 dark:text-yellow-200 font-medium">
+            Best experience on desktop • Limited mobile support
+          </span>
+        </div>
+      </div>
+
       {/* Animated Background Elements */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         <div className="absolute top-20 left-10 w-72 h-72 bg-blue-400/10 dark:bg-blue-400/5 rounded-full blur-3xl animate-pulse" />
