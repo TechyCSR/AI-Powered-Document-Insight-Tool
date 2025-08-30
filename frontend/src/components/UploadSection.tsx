@@ -101,7 +101,17 @@ const UploadSection = ({ onUploadSuccess }: UploadSectionProps) => {
       }
     } catch (err: any) {
       console.error('Upload error:', err);
-      setError(err.response?.data?.message || 'An error occurred during upload');
+      let errorMessage = 'An error occurred during upload';
+      
+      if (err.message) {
+        errorMessage = err.message;
+      } else if (err.response?.data?.message) {
+        errorMessage = err.response.data.message;
+      } else if (err.response?.status) {
+        errorMessage = `Upload failed with status: ${err.response.status}`;
+      }
+      
+      setError(errorMessage);
     } finally {
       setUploading(false);
     }

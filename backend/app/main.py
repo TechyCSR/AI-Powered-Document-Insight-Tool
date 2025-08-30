@@ -11,7 +11,11 @@ from app.routes import router
 from app.config import settings
 
 # Load environment variables
-load_dotenv()
+# Load production environment if available, otherwise fall back to .env
+if os.getenv("ENVIRONMENT") == "production":
+    load_dotenv(".env.production")
+else:
+    load_dotenv()
 
 # Configure logging
 logging.basicConfig(
@@ -50,9 +54,10 @@ app = FastAPI(
 )
 
 # Add CORS middleware
+logger.info(f"Configuring CORS with origins: {settings.origins_list}")
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=settings.allowed_origins,
+    allow_origins=settings.origins_list,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],

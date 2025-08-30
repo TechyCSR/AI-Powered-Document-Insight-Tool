@@ -28,6 +28,7 @@ async def upload_resume(
     """
     Upload and process a resume PDF file
     """
+    logger.info(f"Upload request received for user {user_id}, provider: {provider}, filename: {file.filename}")
     try:
         # Validate file
         if not file.filename:
@@ -257,6 +258,52 @@ async def get_document_preview(
 async def health_check():
     """Health check endpoint"""
     return {"status": "healthy", "timestamp": datetime.utcnow().isoformat()}
+
+@router.post("/test-upload")
+async def test_upload(
+    file: UploadFile = File(...),
+    provider: AIProvider = Form(AIProvider.SARVAM)
+):
+    """
+    Test upload endpoint without authentication for debugging
+    """
+    logger.info(f"Test upload request received, provider: {provider}, filename: {file.filename}")
+    try:
+        # Validate file
+        if not file.filename:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="No file provided"
+            )
+        
+        # Read file content
+        file_content = await file.read()
+        
+        # Validate PDF file
+        try:
+            PDFProcessor.validate_pdf_file(file_content, file.filename, settings.max_file_size)
+        except ValueError as e:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail=str(e)
+            )
+        
+        return {
+            "success": True,
+            "message": "Test upload successful",
+            "filename": file.filename,
+            "file_size": len(file_content),
+            "provider": provider
+        }
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Unexpected error in test_upload: {e}")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="An unexpected error occurred while processing your request"
+        )
 
 
 @router.get("/")
