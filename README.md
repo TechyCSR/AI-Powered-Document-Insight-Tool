@@ -109,7 +109,119 @@ graph TB
 
 ---
 
-## 🌐 **Live Deployment**
+---
+
+## 🚀 **Local Development Setup**
+
+### **Prerequisites**
+- **Node.js** 18+ and npm
+- **Python** 3.9+
+- **Git** for version control
+- **MongoDB Atlas** account (free tier available)
+- **Clerk** account for authentication
+- **AI API Keys** (optional - fallback available)
+
+### **1. Clone Repository**
+```bash
+git clone https://github.com/TechyCSR/AI-Powered-Document-Insight-Tool.git
+cd AI-Powered-Document-Insight-Tool
+```
+
+### **2. Backend Setup**
+```bash
+cd backend
+
+# Create virtual environment
+python -m venv venv
+
+# Activate virtual environment
+# On Windows:
+venv\Scripts\activate
+# On macOS/Linux:
+source venv/bin/activate
+
+# Install dependencies
+pip install -r requirements.txt
+
+# Setup environment variables
+cp env.example .env
+```
+
+**Edit `backend/.env` with your configuration:**
+```env
+# MongoDB Configuration
+MONGODB_URI=mongodb+srv://username:password@cluster.mongodb.net/document_insights?retryWrites=true&w=majority
+
+# Clerk Configuration
+CLERK_SECRET_KEY=sk_test_your_clerk_secret_key_here
+
+# AI API Keys (Optional - fallback available)
+SARVAM_API_KEY=your_sarvam_api_key_here
+GEMINI_API_KEY=your_gemini_api_key_here
+
+# Application Settings
+ENVIRONMENT=development
+DEBUG=True
+ALLOWED_ORIGINS=http://localhost:5173,http://localhost:3000
+```
+
+### **3. Frontend Setup**
+```bash
+cd frontend
+
+# Install dependencies
+npm install
+
+# Setup environment variables
+cp env.example .env.local
+```
+
+**Edit `frontend/.env.local` with your configuration:**
+```env
+VITE_CLERK_PUBLISHABLE_KEY=pk_test_your_clerk_publishable_key_here
+VITE_API_URL=http://localhost:8000
+```
+
+### **4. Start Development Servers**
+
+**Terminal 1 - Backend API:**
+```bash
+cd backend
+# Ensure virtual environment is activated
+uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
+```
+
+**Terminal 2 - Frontend Application:**
+```bash
+cd frontend
+npm run dev
+```
+
+### **5. Access Application**
+- **Frontend**: [`http://localhost:5173`](http://localhost:5173)
+- **Backend API**: [`http://localhost:8000`](http://localhost:8000)
+- **API Documentation**: [`http://localhost:8000/docs`](http://localhost:8000/docs)
+- **Health Check**: [`http://localhost:8000/api/v1/health`](http://localhost:8000/api/v1/health)
+
+### **6. Development Workflow**
+1. **Backend Changes**: Auto-reload enabled with `--reload` flag
+2. **Frontend Changes**: Hot Module Replacement (HMR) active
+3. **Database**: MongoDB Atlas automatically syncs
+4. **Authentication**: Clerk handles dev/prod environments automatically
+
+### **📝 Quick Setup Checklist**
+- [ ] Python 3.9+ installed
+- [ ] Node.js 18+ installed
+- [ ] MongoDB Atlas account created
+- [ ] Clerk account setup with project created
+- [ ] Environment variables configured
+- [ ] Dependencies installed
+- [ ] Both servers running
+- [ ] Application accessible at localhost:5173
+
+---
+
+## 🌐 **Production Deployment**
 
 ### **Production URLs**
 - **Frontend Application**: [`https://summary.techycsr.me`](https://summary.techycsr.me)
@@ -392,5 +504,16 @@ Add to Vercel dashboard:
    - Test file upload functionality
    - Check AI provider integration
 
+---
 
-**Built with ❤️ using modern full-stack technologies**
+## 👨‍💻 **Developer**
+
+**Built with ❤️ by [@TechyCSR](https://techycsr.me)**
+
+*Professional full-stack developer specializing in AI-powered applications and modern web technologies.*
+
+---
+
+*© 2025 TechyCSR • AI-Powered Document Analysis Platform • [summary.techycsr.me](https://summary.techycsr.me)*
+
+
