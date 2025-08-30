@@ -112,10 +112,10 @@ const UploadSection = ({ onUploadSuccess }: UploadSectionProps) => {
       <div className="mb-6">
         <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-2 flex items-center space-x-2">
           <Upload className="h-5 w-5 text-gray-700 dark:text-gray-300" />
-          <span>Upload Resume</span>
+          <span>Upload Document</span>
         </h2>
         <p className="text-gray-600 dark:text-gray-300">
-          Upload your resume in PDF format and choose an AI provider for analysis
+          Upload your document in PDF format and choose an AI provider for analysis
         </p>
       </div>
 
@@ -134,7 +134,7 @@ const UploadSection = ({ onUploadSuccess }: UploadSectionProps) => {
             }`}
           >
             <div className="font-semibold dark:text-white">Sarvam AI</div>
-            <div className="text-sm text-gray-500 dark:text-gray-400 mt-1">Default • Recommended</div>
+            <div className="text-sm text-gray-500 dark:text-gray-400 mt-1">Default </div>
           </button>
           
           <button
@@ -146,7 +146,7 @@ const UploadSection = ({ onUploadSuccess }: UploadSectionProps) => {
             }`}
           >
             <div className="font-semibold dark:text-white">Gemini AI</div>
-            <div className="text-sm text-gray-500 dark:text-gray-400 mt-1">Alternative Option</div>
+            <div className="text-sm text-gray-500 dark:text-gray-400 mt-1">Alternative Option but Recommended</div>
           </button>
         </div>
       </div>

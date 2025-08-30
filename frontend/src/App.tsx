@@ -4,6 +4,7 @@ import Dashboard from './components/Dashboard';
 import LandingPage from './components/LandingPage';
 import ThemeToggle from './components/ThemeToggle';
 import MobileMessage from './components/MobileMessage';
+import NotFoundPage from './components/NotFoundPage';
 import { ThemeProvider } from './contexts/ThemeContext';
 import { useMobileDetection } from './hooks/useMobileDetection';
 
@@ -107,6 +108,11 @@ function MainApp() {
                   </SignedIn>
                 </>
               }
+            />
+            {/* 404 Catch-all route */}
+            <Route
+              path="*"
+              element={<NotFoundPage />}
             />
           </Routes>
         </div>

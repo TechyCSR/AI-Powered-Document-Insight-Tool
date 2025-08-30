@@ -113,6 +113,19 @@ const Dashboard = () => {
         </div>
       </header>
 
+      {/* Resume Specialization Note */}
+      <div className="bg-gradient-to-r from-blue-50 to-purple-50 dark:from-blue-900/20 dark:to-purple-900/20 border-b border-blue-200 dark:border-blue-800">
+        <div className="max-w-7xl mx-auto px-6 py-3">
+          <div className="flex items-center justify-center space-x-2 text-sm">
+            <span className="text-blue-600 dark:text-blue-400">📄</span>
+            <span className="text-blue-800 dark:text-blue-200 font-medium">
+              This application is specialized for resume analysis - prefer to upload resumes for best results
+            </span>
+            <span className="text-blue-600 dark:text-blue-400">✨</span>
+          </div>
+        </div>
+      </div>
+
       {/* Navigation Tabs */}
       <div className="bg-white dark:bg-gray-800 border-b dark:border-gray-700">
         <div className="max-w-7xl mx-auto px-6">
