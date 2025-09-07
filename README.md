@@ -2,8 +2,8 @@
 
 > **Professional-grade resume analysis platform powered by advanced AI models with intelligent document type detection and comprehensive insight generation.**
 
-[![Live Demo](https://img.shields.io/badge/🌐_Live_Demo-summary.techycsr.me-blue?style=for-the-badge)](https://summary.techycsr.me)
-[![API Status](https://img.shields.io/badge/🔗_API-summaryapi.techycsr.me-green?style=for-the-badge)](https://summaryapi.techycsr.me/api/v1/health)
+[![Live Demo](https://img.shields.io/badge/🌐_Live_Demo-summary.techycsr.me-blue?style=for-the-badge)](https://summary.techycsr.dev)
+[![API Status](https://img.shields.io/badge/🔗_API-summaryapi.techycsr.me-green?style=for-the-badge)](https://summaryapi.techycsr.dev/api/v1/health)
 
 ## 🎯 **Project Overview**
 
@@ -224,9 +224,9 @@ npm run dev
 ## 🌐 **Production Deployment**
 
 ### **Production URLs**
-- **Frontend Application**: [`https://summary.techycsr.me`](https://summary.techycsr.me)
+- **Frontend Application**: [`https://summary.techycsr.dev`](https://summary.techycsr.dev)
 - **Backend API**: [`https://summaryapi.techycsr.me`](https://summaryapi.techycsr.me)
-- **Health Endpoint**: [`https://summaryapi.techycsr.me/api/v1/health`](https://summaryapi.techycsr.me/api/v1/health)
+- **Health Endpoint**: [`https://summaryapi.techycsr.dev/api/v1/health`](https://summaryapi.techycsr.dev/api/v1/health)
 
 ### **API Endpoints**
 
@@ -437,7 +437,7 @@ The system automatically detects document types:
 
 ---
 
-*Built with modern web technologies for professional document analysis workflows. Deployed and operational at [summary.techycsr.me](https://summary.techycsr.me)*
+*Built with modern web technologies for professional document analysis workflows. Deployed and operational at [summary.techycsr.me](https://summary.techycsr.dev)*
       "filename": "resume.pdf",
       "upload_date": "2025-08-28T14:00:00Z",
       "provider": "sarvam",
@@ -514,6 +514,6 @@ Add to Vercel dashboard:
 
 ---
 
-*© 2025 TechyCSR • AI-Powered Document Analysis Platform • [summary.techycsr.me](https://summary.techycsr.me)*
+*© 2025 TechyCSR • AI-Powered Document Analysis Platform • [summary.techycsr.me](https://summary.techycsr.dev)*
 
 
